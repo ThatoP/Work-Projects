@@ -1,0 +1,57 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+  	<servlet-name>form</servlet-name>
+  	<display-name>form</display-name>
+  	<description></description>
+  	<servlet-class>form</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>controller</servlet-name>
+  	<display-name>controller</display-name>
+  	<description></description>
+  	<servlet-class>com.demo.controller</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>DBLink</servlet-name>
+  	<display-name>DBLink</display-name>
+  	<description></description>
+  	<servlet-class>com.demo.DBLink</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>DBEdit</servlet-name>
+  	<display-name>DBEdit</display-name>
+  	<description></description>
+  	<servlet-class>com.demo.DBEdit</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>MyFilterClass</servlet-name>
+  	<display-name>MyFilterClass</display-name>
+  	<description></description>
+  	<servlet-class>MyFilterClass</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>form</servlet-name>
+  	<url-pattern>/form</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>controller</servlet-name>
+  	<url-pattern>/controller</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>DBLink</servlet-name>
+  	<url-pattern>/DBLink</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>DBEdit</servlet-name>
+  	<url-pattern>/DBEdit</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>MyFilterClass</servlet-name>
+  	<url-pattern>/MyFilterClass</url-pattern>
+  </servlet-mapping>
+</web-app>
