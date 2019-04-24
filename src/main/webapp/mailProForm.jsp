@@ -1,3 +1,7 @@
+<!-- This code is property of Willow Woods (Pty) Ltd -->
+<!-- @developer: Thato Puoetsile -->
+<!-- @qualification: Software Development and Engineering Management -->
+
 <%@ page import="com.demo.*" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -11,6 +15,9 @@
   	<link rel="stylesheet" href="/resources/demos/style.css">
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<%
+	response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+	%>
 	<style>
 		.bttn{
 			background-color:white; 
@@ -106,8 +113,16 @@
 	</style>
 </head>
 <body>
+	<%
+		//response.setHeader("Cache-Control","no-cache"); //Forces caches to obtain a new copy of the page from the origin server
+		//response.setHeader("Cache-Control","no-store"); //Directs caches not to store the page under any circumstance
+		//response.setDateHeader("Expires", 0); //Causes the proxy cache to see the page as "stale"
+		//response.setHeader("Pragma","no-cache");
+		
+		//response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+	%>
 	<h2>MAIL PROCESSING FORM</h2>
-	<p><a href="index.jsp"><img src="images/user.png" title="Log Out"></a>You are logged in as <%= session.getAttribute("user") %></p>
+	<p><a href="logout.jsp"><img src="images/user.png" title="Log Out"></a>You are logged in as <%= session.getAttribute("user") %></p>
 	<div id="formlet">
 		<form action="./DBLink" method="POST" autocomplete = "off">
 			<div id="navbar">
@@ -128,44 +143,41 @@
 			</button>
 			</div><br><br>
 			<label><b>Reference Number:</b></label>
-			<input type="text" name="ref" required><br><br>
+			<input type="text" name="file" ><br><br>
 			<label><b>Date on Letter:</b></label> 
-			<input type="text" id="dt" name="letterDate" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"><br><br>
+			<input type="text" id="dt" name="letterDate" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
 			<label><b>Originating Department:</b></label> 
 			<input type="text" name="origin"><br><br>
 			<label><b>Subject:</b></label>
 			<input type="text" name="sub"><br><br>
 			<label><b>Date Received:</b></label> 
-			<input type="text" id="dt1" name="dateRec" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"><br><br>
+			<input type="text" id="dt1" name="dateRec" onchange="days()" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
 			<label><b>Action Officer:</b></label> 
 			<input type="text" name="officer" list="officers" autocomplete="off"><br><br>
 			<datalist id="officers"><select>
-				<option value="Director">
-				<option value="Deputy Director">
-				<option value="AD - HR/Administration">
-				<option value="AD - Placement">
-				<option value="AD - M&E">
-				<option value="AD - Disbursement">
-				<option value="AD - Costing">
-				<option value="AD - Recovery">
-				<option value="AD - Contracts">
-				<option value="CEO - Placement">
-				<option value="CEO - M&E">
-				<option value="CEO - Finance">
-				<option value="Head of IT">
-				<option value="Head of Publicity">
-				<option value="Chief Records Officer"></select>
+				<option value="Director"><option value="Deputy Director"><option value="AD - HR/Administration"><option value="AD - Placement">
+				<option value="AD - M&E"><option value="AD - Disbursement"><option value="AD - Costing"><option value="AD - Recovery">
+				<option value="AD - Contracts"><option value="CEO - Placement"><option value="CEO - M&E"><option value="CEO - Finance">
+				<option value="Head of IT"><option value="Head of Publicity"><option value="Chief Records Officer">
+				<option value="PSPO1 (P)"><option value="PSPO2 (P)"><option value="PSPO3 (P)"><option value="PSPO4 (P)">
+				<option value="PSPO5 (P)"><option value="PSPO6 (P)"><option value="SSPO1 (P)"><option value="SSPO2 (P)">
+				<option value="SSPO3 (P)"><option value="SPO1 (P)"><option value="SSPO2 (P)"><option value="SSPO3 (P)">
+				<option value="CPO (M&E)"><option value="PSPO1 (M&E)"><option value="PSPO3 (M&E)"><option value="PSPO4 (M&E)"><option value="PSPO5 (M&E)">
+				<option value="PSPO6 (M&E)"><option value="PSPO8 (M&E)"><option value="PSPO10 (M&E)"><option value="PSPO11 (M&E)">
+				<option value="PSPO13 (M&E)"><option value="PSPO14 (M&E)"><option value="CAO2 (M&E)"><option value="PAO (M&E)">
+				<option value="Intern1 (M&E)"><option value="Intern2 (M&E)">
+				</select>
 			</datalist>
-			<label><b>File/Folio Number: </b></label> 
-			<input type="text" name="fileFolio"><br><br>
+			<label><b>Folio Number: </b></label> 
+			<input type="text" name="folio"><br><br>
 			<label><b>Date Marked:</b></label> 
-			<input type="text" id="mkd" name="markDate" onchange="days()" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"><br><br>
+			<input type="text" id="mkd" name="markDate" onchange="days(); aDays()" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
 			<label><b>Days taken to mark:</b></label> 
-			<input type="text" name="mDays" id="mDays" readonly><br><br>
+			<input type="text" name="mDays" id="mDays" pattern="[0-9]" readonly><br><br>
 			<label><b>Action Date:</b></label> 
-			<input type="text" id="actn" name="actDate" onchange="aDays()" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"><br><br>
+			<input type="text" id="actn" name="actDate" onchange="aDays()" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
 			<label><b>Days Taken to Act:</b></label> 
-			<input type="text" name="actDays" id="actDays" readonly><br>
+			<input type="text" name="actDays" id="actDays" pattern="[0-9]" readonly><br>
 		</form>
 	</div>
 </body>
@@ -198,17 +210,26 @@
 		
 		//autocalculating the number of days fields
 		var days = function() {
-			let a = new Date(document.querySelector("#dt1").value);
-			let b = new Date(document.querySelector("#mkd").value);
+			var a = new Date(document.querySelector("#dt1").value);
+			var b = new Date(document.querySelector("#mkd").value);
 			
-			if((b.getTime() - a.getTime()) < 0){
-				let diff = "Invalid date @ Date Marked";
-				document.getElementById("mDays").value = diff;
+			if (a.getTime() >= 0){
+				if((b.getTime() - a.getTime()) < 0){
+					document.getElementById("mDays").value = "Invalid input";
+				}
+				else if((b.getTime() - a.getTime()) >= 0){
+					let sec = b.getTime() - a.getTime();
+					let diff = Math.ceil(sec / (1000 * 3600 * 24)) + 1;
+					document.getElementById("mDays").value = diff;
+				}
+				else {
+					document.getElementById("mDays").value = "0";
+					document.getElementById("actDays").value = "0";
+					
+				}
 			}
-			else{
-				let sec = Math.abs(b.getTime() - a.getTime());
-				let diff = Math.ceil(sec / (1000 * 3600 * 24));
-				document.getElementById("mDays").value = diff;
+			else {
+				document.getElementById("mDays").value = "NaN";
 			}
 		}
 		
@@ -216,14 +237,21 @@
 			let one = new Date(document.querySelector("#mkd").value);
 			let two = new Date(document.querySelector("#actn").value);
 			
-			if((two.getTime() - one.getTime()) < 0){
-				let result = "Invalid date @ Action Date";
-				document.getElementById("actDays").value = result;
+			if (one.getTime() >= 0){
+				if((two.getTime() - one.getTime()) < 0){
+					document.getElementById("actDays").value = "Invalid input";
+				}
+				else if((two.getTime() - one.getTime()) >= 0){
+					let secs = two.getTime() - one.getTime();
+					let result = Math.ceil(secs / (1000 * 3600 * 24)) + 1;
+					document.getElementById("actDays").value = result;
+				}
+				else{
+					document.getElementById("actDays").value = "0";
+				}
 			}
-			else{
-				let secs = Math.abs(two.getTime() - one.getTime());
-				let result = Math.ceil(secs / (1000 * 3600 * 24));
-				document.getElementById("actDays").value = result;
+			else {
+				document.getElementById("actDays").value = "NaN";
 			}
 		}
 	</script>

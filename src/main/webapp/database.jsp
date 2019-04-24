@@ -1,3 +1,7 @@
+<!-- This code is property of Willow Woods (Pty) Ltd -->
+<!-- @developer: Thato Puoetsile -->
+<!-- @qualification: Software Development and Engineering Management -->
+
 <%@ page import="com.demo.*" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -8,6 +12,9 @@
 	<link rel="icon" href="images/favicon.ico">
 	<title>MailPro</title>
 	<style type="text/css">
+	<%
+		response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+	%>
 		body{
 			background-image: url("images/paper.png");
 			background-repeat: tile;
@@ -34,7 +41,6 @@
 			width: 98%;
 			height:400px;
 			padding: 10px;
-			background: white;
 			overflow-y: auto;
 		}
 		img {
@@ -45,8 +51,9 @@
 	</style>
 </head>
 <body onload="scrollable()">
+	
 	<h2>Incoming Mail Database</h2>
-	<p><a href="index.jsp"><img src="images/user.png" title="Log Out"></a>You are logged in as <%= session.getAttribute("user") %></p><br> 
+	<p><a href="logout.jsp"><img src="images/user.png" title="Log Out"></a>You are logged in as <%= session.getAttribute("user") %></p><br> 
     <%
     	DBConnection.createConnection();
    	 	DBConnection.stmt = DBConnection.con.prepareStatement("SELECT * FROM rmunit.inmail");
@@ -55,13 +62,14 @@
         <div id="tableTop">
         	<table id="tablet">
         	<tr>
-        		<th>Reference Number</th>
+        		<th>System Id.</th>
         		<th>Date on Letter</th>
         		<th>Originating Department</th>
         		<th>Subject</th>
         		<th>Date Received</th>
         		<th>Action Officer</th>
-        		<th>File/Folio</th>
+        		<th>Reference Number</th>
+        		<th>Folio</th>
         		<th>Date Marked</th>
         		<th>Days Taken To Mark</th>
         		<th>Action Date</th>
@@ -71,13 +79,14 @@
         		DBConnection.res.beforeFirst();
         		while(DBConnection.res.next()){ %>
         			<tr>
-        				<td><%= DBConnection.res.getString("RefNumber")%></td>
+        				<td><%= DBConnection.res.getString("id")%></td>
         				<td><%= DBConnection.res.getString("DateOnLetter")%></td>
         				<td><%= DBConnection.res.getString("OriginDept")%></td>
         				<td><%= DBConnection.res.getString("Subject")%></td>
         				<td><%= DBConnection.res.getString("DateRec")%></td>
         				<td><%= DBConnection.res.getString("ActionOfficer")%></td>
-        				<td><%= DBConnection.res.getString("fileFolio")%></td>
+        				<td><%= DBConnection.res.getString("RefNum")%></td>
+        				<td><%= DBConnection.res.getString("Folio")%></td>
         				<td><%= DBConnection.res.getString("DateMarked")%></td>
         				<td><%= DBConnection.res.getString("Days")%></td>
         				<td><%= DBConnection.res.getString("ActDate")%></td>

@@ -1,3 +1,9 @@
+/**
+ * This code is property of Willow Woods (Pty) Ltd
+ * @author Thato Puoetsile
+ * @qualification: Software Development and Engineering Management
+ */
+
 package com.demo;
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,11 +32,12 @@ import javax.swing.JOptionPane;
 public class DBLink extends HttpServlet 
 {
 	private static final long serialVersionUID = 1L;
-	public static String[] sqldata = new String[11];
+	public static String[] sqldata = new String[12];
 	// variables for connecting to the database
 	public PreparedStatement stmt = null;
 	static Statement myStmt = null;
 	public ResultSet res = null;
+	public static String filename = null;
        
     public DBLink() {
         super();
@@ -45,38 +52,39 @@ public class DBLink extends HttpServlet
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession();
+		String name = (String) session.getAttribute("user");
 		
-		String[] data = new String[13];
-		data[0] = request.getParameter("ref");
-		data[1] = request.getParameter("letterDate");
-		data[2] = request.getParameter("origin");
-		data[3] = request.getParameter("sub");
-		data[4] = request.getParameter("dateRec");
-		data[5] = request.getParameter("officer");
-		data[6] = request.getParameter("fileFolio");
-		data[7] = request.getParameter("markDate");
-		data[8] = request.getParameter("mDays");
-		data[9] = request.getParameter("actDate");
-		data[10] = request.getParameter("actDays");
-		data[11] = (String) session.getAttribute("user");
+		if(name != null) {
+			String[] data = new String[13];
+			data[0] = request.getParameter("letterDate");
+			data[1] = request.getParameter("origin");
+			data[2] = request.getParameter("sub");
+			data[3] = request.getParameter("dateRec");
+			data[4] = request.getParameter("officer");
+			data[5] = request.getParameter("file");
+			data[6] = request.getParameter("folio");
+			data[7] = request.getParameter("markDate");
+			data[8] = request.getParameter("mDays");
+			data[9] = request.getParameter("actDate");
+			data[10] = request.getParameter("actDays");
+			data[11] = (String) session.getAttribute("user");
+					
+			String act = request.getParameter("action");
+			
+			if(act.equals("save")) {
+				Date date = new Date();
+				DateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				data[12] = d.format(date);
 				
-		String act = request.getParameter("action");
-		
-		if(act.equals("save")) {
-			Date date = new Date();
-			DateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			data[12] = d.format(date);
-			if(!(data[0].equals("null"))) {
 				//DBConnection.saveRecord(data);
 				DBConnection.createConnection(); 
 				try {
 					myStmt = DBConnection.con.createStatement();
 					
-					//INSERT INTO RMUNIT VALUES ('RefNum','DateOnLetter','OrigDept','Subject','DateRec','ActionOfficer','DateMarked','Days');
-					String dbop = "INSERT INTO rmunit.inmail VALUES ('" + data[0].trim() + "','" + data[1] + "', '" + data[2] + "', '" + data[3] + "', '"
-							+ data[4] + "', '"+ data[5] +"', '" + data[6] + "', '" + data[7] + "','"+ data[8] +"', '"+ data[9] +"', '"+ data[10] +"', '"+session .getAttribute("user")+"',"
-							+ "'"+data[12]+"')";
-					
+					//INSERT INTO RMUNIT VALUES ('DateOnLetter','OrigDept','Subject','DateRec','ActionOfficer','DateMarked','Days');
+					String dbop = "INSERT INTO rmunit.inmail VALUES (NULL,'" + data[0] + "', '" + data[1] + "', '" + data[2] + "', '"
+							+ data[3] + "', '"+ data[4] +"', '" + data[5] + "', '" + data[6] + "','"+ data[7] +"', '"+ data[8] +"', '"+ data[9] +"',"
+									+ "'"+data[10]+"','"+session.getAttribute("user")+"','"+data[12]+"')";
 					//Executing the statement
 					myStmt.executeUpdate(dbop);
 
@@ -88,53 +96,17 @@ public class DBLink extends HttpServlet
 					response.sendRedirect("error.jsp");
 				}
 			}
-		}
-		else if(act.equals("search")){
-			DBConnection.createConnection();
-			try {
-				// Prepare the statement
-				stmt = DBConnection.con.prepareStatement("SELECT * FROM rmunit.inmail WHERE RefNumber=?");
-				
-				// Set parameters
-				stmt.setString(1, data[0]);
-				
-				// Execute SQL query
-				res = stmt.executeQuery();
-				
-				//Passing the results to the display
-				if (res.first()) {
-					res.beforeFirst(); //moving the pointer back to the start of the row of results
-					while (res.next()) {
-						
-						sqldata[0] = res.getString("RefNumber");
-						sqldata[1] = res.getString("DateOnLetter");
-						sqldata[2] = res.getString("OriginDept");
-						sqldata[3] = res.getString("Subject");
-						sqldata[4] = res.getString("DateRec");
-						sqldata[5] = res.getString("ActionOfficer");
-						sqldata[6] = res.getString("FileFolio");
-						sqldata[7] = res.getString("DateMarked");
-						sqldata[8] = res.getString("Days");
-						sqldata[9] = res.getString("ActDate");
-						sqldata[10] = res.getString("DaysToAct");
-						
-						response.sendRedirect("search.jsp");
-					}
-				}else {
-					for(int i=0; i<11; i++) {
-						sqldata[i] = null;
-					}
-					response.sendRedirect("error.jsp");
-				}
-				stmt.close();
+			else if(act.equals("search")){
+				filename = data[5];
+				response.sendRedirect("search.jsp");
 			}
-			catch (SQLException ex) {
-				Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
-				response.sendRedirect("error.jsp");
+			else if(act.equals("db")) {
+				response.sendRedirect("database.jsp");
 			}
-		}
-		else if(act.equals("db")) {
-			response.sendRedirect("database.jsp");
+		}else {
+			out.println("<p style ='color: red; text-align: centre; font-size: 18px;'> Error: Your session has timed out. Please log in. </p>");
+			RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+			rd.forward(request, response);
 		}
 	}
 }

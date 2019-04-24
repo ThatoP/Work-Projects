@@ -1,3 +1,7 @@
+<!-- This code is property of Willow Woods (Pty) Ltd -->
+<!-- @developer: Thato Puoetsile -->
+<!-- @qualification: Software Development and Engineering Management -->
+
 <%@ page import="com.demo.*" %>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
@@ -12,6 +16,9 @@
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<%
+		response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+	%>
 	<style>
 		.bttn{
 			background-color: white;
@@ -84,6 +91,23 @@
 			height: 200px;
 			overflow: auto;
 		}
+		#tableTop{
+			width: 98%;
+			height: 200px;
+			padding: 10px;
+			overflow-y: auto;
+			background: white;
+		}
+		th,td{
+			border: 1px solid black;
+			padding: 3px;
+			font-size: 13px;
+			height: 30px;
+			width: 200px;
+		}
+		table{
+			border-spacing: 1px;
+		}
 		#formlet{
 			padding: 10px;
 			margin-left: auto;
@@ -98,97 +122,103 @@
 		}
 	</style>
 </head>
-<body>
+<body onload = "scrollable()">
+	<%
+		//response.setHeader("Cache-Control","no-cache"); //Forces caches to obtain a new copy of the page from the origin server
+		//response.setHeader("Cache-Control","no-store"); //Directs caches not to store the page under any circumstance
+		//response.setDateHeader("Expires", 0); //Causes the proxy cache to see the page as "stale"
+		//response.setHeader("Pragma","no-cache");
+		
+		//response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+	%>
+	
 	<h2>SEARCH RESULTS</h2>
-	<p><a href="index.jsp"><img src="images/user.png" title="Log Out"></a>You are logged in as <%= session.getAttribute("user")%></p>
+	<p><a href="logout.jsp"><img src="images/user.png" title="Log Out" ></a>You are logged in as <%= session.getAttribute("user")%></p>
+	<% 
+		DBConnection.createConnection(); 
+		//Prepare the statement
+		DBConnection.stmt = DBConnection.con.prepareStatement("SELECT * FROM rmunit.inmail WHERE RefNum=?");
+		//Set parameters
+		DBConnection.stmt.setString(1, DBLink.filename);
+		//Executing the SQL query
+		DBConnection.res = DBConnection.stmt.executeQuery();
+	%>
+        <div id="tableTop">
+        	<table id="tablet">
+        	<tr>
+        		<th>System Id.</th>
+        		<th>Date on Letter</th>
+        		<th>Originating Department</th>
+        		<th>Subject</th>
+        		<th>Date Received</th>
+        		<th>Action Officer</th>
+        		<th>Reference Number</th>
+        		<th>Folio</th>
+        		<th>Date Marked</th>
+        		<th>Days Taken To Mark</th>
+        		<th>Action Date</th>
+        		<th>Days Taken To Act</th>
+        	</tr>
+        	<%
+        		DBConnection.res.beforeFirst();
+        		while(DBConnection.res.next()){ %>
+        			<tr>
+        				<td><%= DBConnection.res.getString("id")%></td>
+        				<td><%= DBConnection.res.getString("DateOnLetter")%></td>
+        				<td><%= DBConnection.res.getString("OriginDept")%></td>
+        				<td><%= DBConnection.res.getString("Subject")%></td>
+        				<td><%= DBConnection.res.getString("DateRec")%></td>
+        				<td><%= DBConnection.res.getString("ActionOfficer")%></td>
+        				<td><%= DBConnection.res.getString("RefNum")%></td>
+        				<td><%= DBConnection.res.getString("Folio")%></td>
+        				<td><%= DBConnection.res.getString("DateMarked")%></td>
+        				<td><%= DBConnection.res.getString("Days")%></td>
+        				<td><%= DBConnection.res.getString("ActDate")%></td>
+        				<td><%= DBConnection.res.getString("DaysToAct")%></td>
+        			</tr>
+        		<%}%>
+        </table>
+	</div><br><br>
 	<div id="formlet">
-		<form action="./DBEdit" method="POST">
+		<form action="./DBLink2" method="POST" autocomplete = "off">
 			<div id="navbar">
-				<button type="submit" name="action" class="bttn" value="update" title="Update Record">
-					<img alt="Update Record" src="images/update.png">
-				</button>
-				<div id="space"></div>
-				<button type="submit" name="action" class="bttn" value="delete" title="Delete Record">
-					<img alt="Delete Record" src="images/delete.png">
-				</button>
-				<div id="space"></div>
-				<button type="submit" name="action" class="bttn" value="home" title="Mail Processing Form">
-						<img alt="Mail Processing Form" src="images/home.png">
-				</button>
-				<div id="space"></div>
-				<button type="submit" value="action" class="bttn" value="db" title="View Database">
-					<img alt="View DB" src="images/database.png">
-				</button>
-				</div><br><br>
-				
-				<label><b>Reference Number:</b></label>
-				<input type="text" name="ref" value="<%= DBLink.sqldata[0] %>" ><br><br>
-				<label><b>Date on Letter:</b></label>
-				<input type="text" id="dt" name="letterDate" value="<%= DBLink.sqldata[1] %> " pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"readonly><br><br>
-				<label><b>Originating Department:</b></label>
-				<input type="text" name="origin" value="<%= DBLink.sqldata[2] %>" readonly><br><br>
-				<label><b>Subject:</b></label>
-				<input type="text" name="sub" value="<%= DBLink.sqldata[3] %>" readonly><br><br>
-				<label><b>Date Received:</b></label>
-				<input type="text" id="dt1" name="dateRec" value="<%= DBLink.sqldata[4] %>" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
-				<label><b>Action Officer:</b></label>
-				<input type="text" name="officer" value="<%= DBLink.sqldata[5] %>" readonly><br><br>
-				<label><b>File/Folio Number:</b></label>
-				<input type="text" name="fileFolio" value="<%= DBLink.sqldata[6] %>"><br><br>
-				<label><b>Date Marked:</b></label>
-				<input type="text" id="mkd" name="markDate" onchange="days()" value="<%= DBLink.sqldata[7] %>" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
-				<label><b>Days taken to mark:</b></label>
-				<input type="text" name="mDays" id="mDays" readonly value="<%= DBLink.sqldata[8] %>" ><br><br>
-				<label><b>Action Date:</b></label>
-				<input type="text" id="actn" name="actDate" onchange="aDays()" value="<%= DBLink.sqldata[9] %>" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly><br><br>
-				<label><b>Days Taken to Act:</b></label>
-				<input type="text" name="actDays" id="actDays" readonly value="<%= DBLink.sqldata[10] %>">
+			<button type="submit" name="action" class="bttn" value="save" title="Save Record" disabled>
+				<img alt="Save Record" src="images/save.png">
+			</button>
+			<div id="space"></div>
+			<button type="submit" name="action" class="bttn" value="search" title="Search">
+				<img alt="Find Record" src="images/search.png">
+			</button>
+			<div id="space"></div>
+			<button type="submit" name="action" class="bttn" value="home" title="Mail Processing Form">
+				<img alt="Mail Processing Form" src="images/home.png">
+			</button>
+			<div id="space"></div>
+			<button type="submit" name="action" class="bttn" value="db" title="View Database">
+				<img alt="View Database" src="images/database.png">
+			</button>
+			</div><br><br>
+			<label><b>System Id.: </b></label>
+			<input type="text" name="ref"><br><br>
+			<label><b>Reference Number: </b></label>
+			<input type="text" name="file" value="<%= DBLink.filename %>" readonly>
 		</form>
 	</div>
 </body>
 <script>
-		$(function(){
-        	$("#mkd").datepicker({ dateFormat: 'yy-mm-dd', 
-        		maxDate: new Date(),
-        		//defaultDate: new Date(1000, 01, 01)
-        	});
-        });
-		$(function(){
-        	$("#actn").datepicker({ dateFormat: 'yy-mm-dd', 
-        		maxDate: new Date(),
-        		//minDate: new Date($()),
-        		//defaultDate: new Date(1000, 01, 01)
-        	});
-        });
-		
-		var days = function() {
-			let a = new Date(document.querySelector("#dt1").value);
-			let b = new Date(document.querySelector("#mkd").value);
-			
-			if((b.getTime() - a.getTime()) < 0){
-				let diff = "Invalid date @ Date Marked";
-				document.getElementById("mDays").value = diff;
-			}
-			else{
-				let sec = Math.abs(b.getTime() - a.getTime());
-				let diff = Math.ceil(sec / (1000 * 3600 * 24));
-				document.getElementById("mDays").value = diff;
-			}
-		}
-		
-		var  aDays = function(){
-			let one = new Date(document.querySelector("#mkd").value);
-			let two = new Date(document.querySelector("#actn").value);
-			
-			if((two.getTime() - one.getTime()) < 0){
-				let result = "Invalid date @ Action Date";
-				document.getElementById("actDays").value = result;
-			}
-			else{
-				let secs = Math.abs(two.getTime() - one.getTime());
-				let result = Math.ceil(secs / (1000 * 3600 * 24));
-				document.getElementById("actDays").value = result;
-			}
-		}
+		var scrollable = function() {
+            // Constant retrieved from server-side via JSP
+            let maxRows = 5;
+            let table = document.getElementById('tablet');
+            let wrapper = table.parentNode;
+            let rowsInTable = table.rows.length;
+            let height = 0;
+            if (rowsInTable > maxRows) {
+                for (var i = 0; i < maxRows; i++) {
+                    height += table.rows[i].clientHeight;
+                }
+                wrapper.style.height = height + "px";
+            }
+        }
 </script>
 </html>

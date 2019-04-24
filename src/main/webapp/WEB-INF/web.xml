@@ -34,6 +34,18 @@
   	<description></description>
   	<servlet-class>MyFilterClass</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>logoutController</servlet-name>
+  	<display-name>logoutController</display-name>
+  	<description></description>
+  	<servlet-class>com.demo.logoutController</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>DBLink2</servlet-name>
+  	<display-name>DBLink2</display-name>
+  	<description></description>
+  	<servlet-class>com.demo.DBLink2</servlet-class>
+  </servlet>
   <servlet-mapping>
   	<servlet-name>form</servlet-name>
   	<url-pattern>/form</url-pattern>
@@ -53,5 +65,13 @@
   <servlet-mapping>
   	<servlet-name>MyFilterClass</servlet-name>
   	<url-pattern>/MyFilterClass</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>logoutController</servlet-name>
+  	<url-pattern>/logoutController</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>DBLink2</servlet-name>
+  	<url-pattern>/DBLink2</url-pattern>
   </servlet-mapping>
 </web-app>
